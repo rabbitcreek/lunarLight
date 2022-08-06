@@ -12,7 +12,7 @@
 
 #include <Wire.h> 
 #include <FastLED.h>
-
+#include <TFT_eSPI.h> 
 #define LED_PIN     25
 #define NUM_LEDS    36
 #define BRIGHTNESS  255
@@ -43,7 +43,7 @@ CRGBPalette16 currentPalette;
 CRGBPalette16 currentPalette2;
 static uint8_t startIndex = 0;
 TBlendType    currentBlending;
-
+TFT_eSPI tft = TFT_eSPI();
 // Tide calculation library setup.
 // Change the library name here to predict for a different site.
 //#include "TidelibSanDiegoSanDiegoBay.h"
@@ -137,70 +137,69 @@ void graphTide(DateTime now, DateTime futureHigh, DateTime futureLow,int dS){
 
 void SerialScreen(DateTime now, DateTime futureHigh, DateTime futureLow,int dS){
    bool hiLow;
+   tft.fillScreen(TFT_BLACK);
+   tft.setTextColor(TFT_YELLOW, TFT_BLACK);
+   tft.setTextFont(4);
+   tft.setCursor(0, 0);
    if( int(futureHigh.unixtime() - futureLow.unixtime()) < 0) hiLow = 1;
    if( int(futureHigh.unixtime() - futureLow.unixtime()) > 0) hiLow = 0;
-  
  
   if (hiLow) {
-    Serial.print("HI     ");
-    Serial.println("LOW");
-    Serial.print(futureHigh.hour() +1, DEC); 
-    Serial.print(":");
+    tft.print("HI         ");
+    tft.println("LOW");
+    tft.print(futureHigh.hour() +1, DEC); 
+  tft.print(":");
   if (futureHigh.minute() < 10) {
-    Serial.print("0");
-    Serial.print(futureHigh.minute());
+    tft.print("0");
+    tft.print(futureHigh.minute());
    }
   else if (futureHigh.minute() >= 10) {
-    Serial.print(futureHigh.minute());
+    tft.print(futureHigh.minute());
   }
-  Serial.print(" ");
-  Serial.print(futureLow.hour() +1, DEC); 
-  Serial.print(":");
+  tft.print("       ");
+  tft.print(futureLow.hour() +1, DEC); 
+  tft.print(":");
   if (futureLow.minute() < 10) {
-    Serial.print("0");
-    Serial.print(futureLow.minute());
+    tft.print("0");
+    tft.print(futureLow.minute());
    }
   else if (futureLow.minute() >= 10) {
-    Serial.print(futureLow.minute());
+   tft.print(futureLow.minute());
   }
     
   }
   else {
-    Serial.print("LOW     ");
-    Serial.println("HI");
-    Serial.print(futureLow.hour() +1, DEC); 
-  Serial.print(":");
+    tft.print("LOW         ");
+    tft.println("HI");
+    tft.print(futureLow.hour() +1, DEC); 
+  tft.print(":");
   if (futureLow.minute() < 10) {
-    Serial.print("0");
-    Serial.print(futureLow.minute());
+   tft.print("0");
+   tft.print(futureLow.minute());
    }
   else if (futureLow.minute() >= 10) {
-    Serial.print(futureLow.minute());
+    tft.print(futureLow.minute());
   }
-  Serial.print(" ");
-   Serial.print(futureHigh.hour() +1, DEC); 
-   Serial.print(":");
+  Serial.print("       ");
+   tft.print(futureHigh.hour() +1, DEC); 
+   tft.print(":");
   if (futureHigh.minute() < 10) {
-    Serial.print("0");
-    Serial.print(futureHigh.minute());
+    tft.print("0");
+    tft.print(futureHigh.minute());
    }
   else if (futureHigh.minute() >= 10) {
-    Serial.print(futureHigh.minute());
+    tft.print(futureHigh.minute());
   }
   }
-  Serial.println();
-  
-  
+  tft.println();
+  tft.println();
+  tft.println();
+  tft.println();
+  tft.setTextColor(TFT_RED, TFT_BLACK);
+  tft.drawCentreString("Whittier Dock Tide", 125, 55, 4);
  
 results = myTideCalc.currentTide(now); 
-      //Serial.home();
       
-      //Serial.println(); // Print site name, move to next line
-      Serial.print("  ");
-      Serial.println("SITKA"); // print tide ht. to 3 decimal places
-      //Serial.println(" ft");
-      
-      Serial.println("  Tide Location");
   Serial.print(now.year(), DEC);
   Serial.print("/");
   Serial.print(now.month(), DEC); 
@@ -211,10 +210,10 @@ results = myTideCalc.currentTide(now);
   Serial.print(":");
   if (now.minute() < 10) {
     Serial.print("0");
-    Serial.print(now.minute());
+    Serial.println(now.minute());
    }
   else if (now.minute() >= 10) {
-    Serial.print(now.minute());
+    Serial.println(now.minute());
   }
  Serial.print(" ");
 
@@ -233,7 +232,12 @@ void setup() {
     //fill_solid( currentPalette2, 16, CRGB::White);
 //fill_solid( currentPalette, 16, CRGB::Red);
     currentBlending = LINEARBLEND;
-  
+  tft.init();
+  tft.setRotation(1);
+  tft.fillScreen(TFT_BLACK);
+
+  tft.setTextColor(TFT_YELLOW, TFT_BLACK);
+  tft.setTextFont(4);
     oldmillis = millis() - 15000;
 }
 //------------------------------------------------------------------------------
@@ -273,6 +277,7 @@ void loop() {
   
    }
    if( futureHighGate && futureLowGate) {
+  
     SerialScreen(now, futureHigh, futureLow,dS);
     delay(4000);
     graphTide( now, futureHigh, futureLow, dS);
