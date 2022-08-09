@@ -19,6 +19,7 @@
 #define LED_TYPE    WS2811
 #define COLOR_ORDER GRB
 CRGB leds[NUM_LEDS];
+CRGB ledsBackground[55];
 int section;
 float timer = 0;
 #define UPDATES_PER_SECOND 20
@@ -222,9 +223,10 @@ void setup() {
   Wire.begin();  
   RTC.begin();
   Serial.begin(57600);
-  //RTC.adjust(DateTime(F(__DATE__), F(__TIME__))); 
+  RTC.adjust(DateTime(F(__DATE__), F(__TIME__))); 
   // Start up the Serial display
-  FastLED.addLeds<LED_TYPE, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
+  FastLED.addLeds<LED_TYPE, 25, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
+  FastLED.addLeds<LED_TYPE, 13, COLOR_ORDER>(ledsBackground, 55);
   FastLED.setBrightness(  BRIGHTNESS );
      //fill_solid( currentPalette2, 16, CRGB::White);
     currentPalette = LavaColors_p;
@@ -239,6 +241,9 @@ void setup() {
   tft.setTextColor(TFT_YELLOW, TFT_BLACK);
   tft.setTextFont(4);
     oldmillis = millis() - 15000;
+    fill_solid(ledsBackground, 55, CRGB::White);
+    FastLED.show();
+    
 }
 //------------------------------------------------------------------------------
 void loop() {
