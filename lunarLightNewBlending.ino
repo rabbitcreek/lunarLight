@@ -13,7 +13,7 @@
 #include <Wire.h> 
 #include <FastLED.h>
 #include <TFT_eSPI.h> 
-#define LED_PIN     25
+#define LED_PIN     26
 #define NUM_LEDS    36
 #define BRIGHTNESS  255
 #define LED_TYPE    WS2811
@@ -185,7 +185,7 @@ void setup() {
   Serial.begin(57600);
   //RTC.adjust(DateTime(F(__DATE__), F(__TIME__))); 
   // Start up the Serial display
-  FastLED.addLeds<LED_TYPE, 25, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
+  FastLED.addLeds<LED_TYPE, 26, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
   FastLED.addLeds<LED_TYPE, 13, COLOR_ORDER>(ledsBackground, 55);
   FastLED.setBrightness(  BRIGHTNESS );
      //fill_solid( currentPalette2, 16, CRGB::White);
@@ -213,9 +213,10 @@ void loop() {
       // Calculate current tide height
        if((now.month()>3&&now.month()<11)||(now.month()==3&&now.day()>11)||(now.month()==11&&now.day()<6))dS=1;
    now = (now.unixtime() - dS*3600);
-   if(now.hour() > 22 && now.hour() < 6){    
+   Serial.print(now.hour());
+   if(now.hour() >= 21 || now.hour() < 6){    
     fill_solid(ledsBackground, 55, CRGB::Blue);
-   }else if(now.hour() >= 6 && now.hour() < 10 ){
+   }else if(now.hour() >= 6 && now.hour() < 8 ){
    fill_solid(ledsBackground, 55, CRGB::Yellow);
    }
    else {
@@ -296,12 +297,13 @@ void fillnoise8() {
         
     }
     
-     for( int i = 34; i > 34 -(hourDifference + 3); i = i - 1) {
+     for( int i = 34; i > 34 -(hourDifference ); i = i - 1) {
       
         uint8_t index = inoise8(i*scale, millis()/10+i*scale); 
         leds[i] = ColorFromPalette( currentPalette, index, brightness, LINEARBLEND);
         
-    }
+   }
+    leds[16] =  CRGB::Red;
    
     // With that value, look up the 8 bit colour palette value and assign it to the current LED.
   }
@@ -324,4 +326,5 @@ void fillnoise8() {
         leds[i] = ColorFromPalette( currentPalette2, index, brightness, LINEARBLEND);
         
     }
+    leds[34] = CRGB::Green;
 }
