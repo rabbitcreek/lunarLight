@@ -90,8 +90,8 @@ void graphTide(DateTime now, DateTime futureHigh, DateTime futureLow,int dS){
     Serial.println();
     hourDifference = map(hourDifference, 0,6,16,0);
     hourDifference = constrain(hourDifference,0,16);
-  
-   
+    tft.setCursor(60, 105);
+    tft.println(myTideCalc.currentTide(now));
   
        
 }
@@ -195,7 +195,7 @@ void setup() {
 //fill_solid( currentPalette, 16, CRGB::Red);
     currentBlending = LINEARBLEND;
   tft.init();
-  tft.setRotation(1);
+  tft.setRotation(3);
   tft.fillScreen(TFT_BLACK);
 
   tft.setTextColor(TFT_YELLOW, TFT_BLACK);
@@ -303,7 +303,7 @@ void fillnoise8() {
         leds[i] = ColorFromPalette( currentPalette, index, brightness, LINEARBLEND);
         
    }
-    leds[16] =  CRGB::Red;
+    leds[16] =  CRGB::Green;
    
     // With that value, look up the 8 bit colour palette value and assign it to the current LED.
   }
